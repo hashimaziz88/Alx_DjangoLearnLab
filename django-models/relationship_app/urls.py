@@ -2,8 +2,9 @@ from django.urls import path
 from .views import list_books, LibraryDetailView
 # relationship_app/urls.py
 from django.urls import path
-from .views import RegisterView
-from django.contrib.auth.views import LoginView, LogoutView
+from .views import RegisterView, LoginView, LogoutView
+
+
 
 
 
