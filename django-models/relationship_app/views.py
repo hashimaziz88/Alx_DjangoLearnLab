@@ -13,39 +13,52 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login, authenticate
 from django.views import View
+from django.contrib.auth.forms import UserCreationForm
 
 # Helper functions for role checks
 def is_admin(user):
-    return user.userprofile.role == 'Admin'
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
 
 def is_librarian(user):
-    return user.userprofile.role == 'Librarian'
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
 
 def is_member(user):
-    return user.userprofile.role == 'Member'
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
 # Admin View
-class AdminView(LoginRequiredMixin, View):
-    def get(self, request):
-        if not is_admin(request.user):
-            return render(request, '403.html')  # Use a 403 template or redirect as needed
-        return render(request, 'relationship_app/admin_view.html')
+@user_passes_test(is_admin)
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
 
 # Librarian View
-class LibrarianView(LoginRequiredMixin, View):
-    def get(self, request):
-        if not is_librarian(request.user):
-            return render(request, '403.html')  # Use a 403 template or redirect as needed
-        return render(request, 'relationship_app/librarian_view.html')
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
 
 # Member View
-class MemberView(LoginRequiredMixin, View):
+@user_passes_test(is_member)
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
+
+# Register View
+class RegisterView(View):
     def get(self, request):
-        if not is_member(request.user):
-            return render(request, '403.html')  # Use a 403 template or redirect as needed
-        return render(request, 'relationship_app/member_view.html')
+        form = UserCreationForm()
+        return render(request, 'relationship_app/register.html', {'form': form})
+
+    def post(self, request):
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+            return redirect('login')
+        return render(request, 'relationship_app/register.html', {'form': form})
 
 # Custom LoginView
 class LoginView(View):
