@@ -44,7 +44,7 @@ def member_view(request):
 class LoginView(View):
     def get(self, request):
         form = AuthenticationForm()
-        return render(request, 'login.html', {'form': form})
+        return render(request, 'relationship_app/login.html', {'form': form})
 
     def post(self, request):
         form = AuthenticationForm(request, data=request.POST)
@@ -52,7 +52,7 @@ class LoginView(View):
             user = form.get_user()
             auth_login(request, user)
             return redirect('home')  # Redirect to a home page or dashboard
-        return render(request, 'login.html', {'form': form})
+        return render(request, 'relationship_app/login.html', {'form': form})
 
 
 # Custom LogoutView
