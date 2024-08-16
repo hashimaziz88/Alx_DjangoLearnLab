@@ -11,34 +11,41 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views import View
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import render
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
 
-
+# Helper functions for role checks
 def is_admin(user):
     return user.userprofile.role == 'Admin'
-
 
 def is_librarian(user):
     return user.userprofile.role == 'Librarian'
 
-
 def is_member(user):
     return user.userprofile.role == 'Member'
 
+# Admin View
+class AdminView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not is_admin(request.user):
+            return render(request, '403.html')  # Use a 403 template or redirect as needed
+        return render(request, 'relationship_app/admin_view.html')
 
-@user_passes_test(is_admin)
-def admin_view(request):
-    return render(request, 'admin_view.html')
+# Librarian View
+class LibrarianView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not is_librarian(request.user):
+            return render(request, '403.html')  # Use a 403 template or redirect as needed
+        return render(request, 'relationship_app/librarian_view.html')
 
-
-@user_passes_test(is_librarian)
-def librarian_view(request):
-    return render(request, 'librarian_view.html')
-
-
-@user_passes_test(is_member)
-def member_view(request):
-    return render(request, 'member_view.html')
-
+# Member View
+class MemberView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not is_member(request.user):
+            return render(request, '403.html')  # Use a 403 template or redirect as needed
+        return render(request, 'relationship_app/member_view.html')
 
 # Custom LoginView
 class LoginView(View):
