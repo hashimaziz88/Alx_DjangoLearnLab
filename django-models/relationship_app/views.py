@@ -10,6 +10,35 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.views import View
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import user_passes_test
+
+
+def is_admin(user):
+    return user.userprofile.role == 'Admin'
+
+
+def is_librarian(user):
+    return user.userprofile.role == 'Librarian'
+
+
+def is_member(user):
+    return user.userprofile.role == 'Member'
+
+
+@user_passes_test(is_admin)
+def admin_view(request):
+    return render(request, 'admin_view.html')
+
+
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return render(request, 'librarian_view.html')
+
+
+@user_passes_test(is_member)
+def member_view(request):
+    return render(request, 'member_view.html')
+
 
 # Custom LoginView
 class LoginView(View):
@@ -25,11 +54,13 @@ class LoginView(View):
             return redirect('home')  # Redirect to a home page or dashboard
         return render(request, 'login.html', {'form': form})
 
+
 # Custom LogoutView
 class LogoutView(View):
     def get(self, request):
         auth_logout(request)
         return redirect('login')  # Redirect to login page after logout
+
 
 # RegisterView remains the same
 class RegisterView(View):
@@ -48,7 +79,6 @@ class RegisterView(View):
                 login(request, user)
             return redirect('login')
         return render(request, 'relationship_app/register.html', {'form': form})
-
 
 
 def list_books(request):
