@@ -4,7 +4,7 @@ from .models import Library
 from django.views.generic.detail import DetailView
 # relationship_app/views.py
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import login as auth_login, authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
@@ -35,14 +35,19 @@ class LogoutView(View):
 class RegisterView(View):
     def get(self, request):
         form = UserCreationForm()
-        return render(request, 'register.html', {'form': form})
+        return render(request, 'relationship_app/register.html', {'form': form})
 
     def post(self, request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
             return redirect('login')
-        return render(request, 'register.html', {'form': form})
+        return render(request, 'relationship_app/register.html', {'form': form})
 
 
 
