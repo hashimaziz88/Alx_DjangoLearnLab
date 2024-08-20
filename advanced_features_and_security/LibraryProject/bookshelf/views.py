@@ -5,6 +5,19 @@ from django.shortcuts import render, get_object_or_404
 
 from .forms import BookForm
 from .models import Book
+# LibraryProject/bookshelf/views.py
+
+from .forms import ExampleForm
+
+
+def example_view(request):
+    form = ExampleForm()
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process the form data
+            pass
+    return render(request, 'bookshelf/form_example.html', {'form': form})
 
 
 # views.py
@@ -46,8 +59,6 @@ def create_book(request):
         book = Book.objects.create(title=title, author=author)
         return redirect('view_book', book_id=book.id)
     return render(request, 'bookshelf/create_book.html')
-
-
 
 
 @permission_required('bookshelf.can_delete', raise_exception=True)
