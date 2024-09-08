@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Book, Author
-from .serializers import BookSerializer
+from django.contrib.auth.models import User
 
 
 class BookAPITest(APITestCase):
@@ -17,6 +17,13 @@ class BookAPITest(APITestCase):
         )
         self.list_url = '/books/'
         self.detail_url = f'/books/{self.book.id}/'
+        self.user = self.create_user()  # Create a user for authentication
+
+    def create_user(self):
+        """
+        Helper method to create a test user.
+        """
+        return User.objects.create_user(username='testuser', password='testpassword')
 
     def test_get_books(self):
         """
@@ -31,7 +38,7 @@ class BookAPITest(APITestCase):
         """
         Test that an authenticated user can create a new book.
         """
-        self.client.force_authenticate(user=self.create_user())
+        self.client.login(username='testuser', password='testpassword')
         data = {
             'title': 'New Book',
             'publication_year': 2022,
@@ -45,7 +52,7 @@ class BookAPITest(APITestCase):
         """
         Test that an authenticated user can update an existing book.
         """
-        self.client.force_authenticate(user=self.create_user())
+        self.client.login(username='testuser', password='testpassword')
         data = {'title': 'Updated Title'}
         response = self.client.patch(self.detail_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -55,7 +62,7 @@ class BookAPITest(APITestCase):
         """
         Test that an authenticated user can delete an existing book.
         """
-        self.client.force_authenticate(user=self.create_user())
+        self.client.login(username='testuser', password='testpassword')
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Book.objects.count(), 0)
@@ -77,10 +84,3 @@ class BookAPITest(APITestCase):
         # Test delete
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def create_user(self):
-        """
-        Helper method to create a test user.
-        """
-        from django.contrib.auth.models import User
-        return User.objects.create_user(username='testuser', password='testpassword')
