@@ -48,7 +48,7 @@ class BookListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]  # Unauthenticated users can view books, but cannot create them
 
     # Enable filtering, searching, and ordering
-    filter_backends = [filters.DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [filters.DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_fields = ['author', 'publication_year']  # Enable filtering by author and publication year
     search_fields = ['title', 'author__name']  # Enable search by book title or author name
     ordering_fields = ['title', 'publication_year']  # Enable ordering by title or publication year
