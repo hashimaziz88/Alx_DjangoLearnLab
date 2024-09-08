@@ -1,29 +1,29 @@
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book
 from .serializers import BookSerializer
 
 
-# Create a new book
-class BookCreateView(CreateView):
-    model = Book
-    fields = ['title', 'publication_year', 'author']
-    template_name = 'book_form.html'  # Optional template, can remove for API-only project
-    success_url = reverse_lazy('book-list')
+# List and Create View for Books (read-only for unauthenticated users)
+class BookCreateView(generics.CreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]  # Only authenticated users can create books
 
-# Update an existing book
-class BookUpdateView(UpdateView):
-    model = Book
-    fields = ['title', 'publication_year', 'author']
-    template_name = 'book_form.html'
-    success_url = reverse_lazy('book-list')
 
-# Delete an existing book
-class BookDeleteView(DeleteView):
-    model = Book
-    success_url = reverse_lazy('book-list')
+# Update View for Books (only authenticated users can update)
+class BookUpdateView(generics.UpdateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]  # Only authenticated users can update books
+
+
+# Delete View for Books (only authenticated users can delete)
+class BookDeleteView(generics.DestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]  # Only authenticated users can delete books
+
 
 class BookListView(generics.ListCreateAPIView):
     """
