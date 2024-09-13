@@ -1,2 +1,17 @@
-<h2>{{ object.title }}</h2>
-<p>{{ object.content }}</p>
+<!-- Display existing comments -->
+<h2>Comments:</h2>
+{% for comment in post.comments.all %}
+    <p>{{ comment.content }} - <small>by {{ comment.author }}</small></p>
+    {% if comment.author == user %}
+        <a href="{% url 'comment-update' comment.pk %}">Edit</a>
+        <a href="{% url 'comment-delete' comment.pk %}">Delete</a>
+    {% endif %}
+{% endfor %}
+
+<!-- Comment creation form -->
+<h3>Leave a comment:</h3>
+<form method="POST" action="{% url 'comment-create' post.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
