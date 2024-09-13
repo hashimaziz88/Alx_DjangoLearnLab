@@ -21,11 +21,19 @@ from .forms import CommentForm
 from django.db.models import Q
 from .models import Post
 from taggit.models import Tag
+from django.views.generic import ListView
+from taggit.models import Tag
+from .models import Post
 
-def posts_by_tag(request, tag_slug):
-    tag = Tag.objects.get(slug=tag_slug)
-    posts = Post.objects.filter(tags=tag)
-    return render(request, 'blog/tagged_posts.html', {'posts': posts, 'tag': tag})
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'post_list.html'  # Create this template for listing posts
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('slug')
+        return Post.objects.filter(tags__slug=tag_slug)
+
 
 def search_posts(request):
     query = request.GET.get('q')

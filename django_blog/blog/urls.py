@@ -3,6 +3,8 @@ from . import views
 from .views import PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView
 from .views import CommentCreateView, CommentUpdateView, CommentDeleteView
 from .views import search_posts, posts_by_tag
+from .views import post_detail, comment_update, comment_delete, PostByTagListView
+
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -18,6 +20,6 @@ urlpatterns = [
     path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
-    path('tags/<slug:tag_slug>/', posts_by_tag, name='posts-by-tag'),
+    path('tags/<slug:slug>/', PostByTagListView.as_view(), name='posts-by-tag'),
     path('search/', search_posts, name='search-posts'),
 ]
