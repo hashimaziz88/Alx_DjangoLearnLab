@@ -18,6 +18,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from .models import Post, Comment
 from .forms import CommentForm
+from django.db.models import Q
+from .models import Post
+from taggit.models import Tag
+
+def posts_by_tag(request, tag_slug):
+    tag = Tag.objects.get(slug=tag_slug)
+    posts = Post.objects.filter(tags=tag)
+    return render(request, 'blog/tagged_posts.html', {'posts': posts, 'tag': tag})
+
+def search_posts(request):
+    query = request.GET.get('q')
+    results = Post.objects.filter(
+        Q(title__icontains=query) | Q(content__icontains=query) | Q(tags__name__icontains=query)
+    ).distinct()
+    return render(request, 'blog/search_results.html', {'results': results})
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
