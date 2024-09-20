@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -14,7 +14,7 @@ from notifications.models import Notification
 
 @api_view(['POST'])
 def like_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)  # Use get_object_or_404 for retrieving the post
+    post = generics.get_object_or_404(Post, pk=pk)  # Use get_object_or_404 for retrieving the post
     like, created = Like.objects.get_or_create(user=request.user, post=post)  # Create or get the existing like
 
     if not created:
