@@ -12,7 +12,7 @@ from .models import CustomUser
 from rest_framework import viewsets
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = [IsAuthenticated]
 
