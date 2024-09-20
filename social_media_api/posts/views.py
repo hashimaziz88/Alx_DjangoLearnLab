@@ -1,7 +1,6 @@
 from rest_framework import viewsets, permissions
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 

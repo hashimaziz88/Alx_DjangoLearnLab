@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-User = get_user_model().objects.create_user()
+User = get_user_model().objects.create_user(username='admin', email='<EMAIL>', password='admin')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
