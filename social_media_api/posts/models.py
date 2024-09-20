@@ -1,7 +1,16 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 
 User = get_user_model()
+
+
+class CustomUser(AbstractUser):
+    following = models.ManyToManyField('self', symmetrical=False, related_name='followers')
+
+    def __str__(self):
+        return self.username
+
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
@@ -12,6 +21,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')

@@ -1,13 +1,32 @@
-from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
-from rest_framework import status
 from django.contrib.auth import authenticate
 from .serializers import RegisterSerializer
 from rest_framework import generics, permissions
-from rest_framework.response import Response
 from .serializers import UserProfileSerializer
-from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import CustomUser
+from rest_framework import viewsets
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def follow(self, request, pk=None):
+        user = self.get_object()
+        request.user.following.add(user)
+        return Response({'status': 'following'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def unfollow(self, request, pk=None):
+        user = self.get_object()
+        request.user.following.remove(user)
+        return Response({'status': 'unfollowed'}, status=status.HTTP_200_OK)
 
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
